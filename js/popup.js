@@ -17,7 +17,7 @@ import { logToUi } from './dev_utils.js';
 // TODO RECONFIRM
 
 // TODO no-discard fucntionality - priritize this!! the above is important, but don't care prioritywise
-
+// could also do this in a separate module, for sanity.
 
 
 const RELOAD_MINS_TEMP = 0.5;
