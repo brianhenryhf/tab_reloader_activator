@@ -98,6 +98,8 @@ const RELOAD_MINS_TEMP = 0.5;
     const currentTab = await getCurrentTab();
     // log(tab)
 
+    reloadCurrentBtn.querySelector('#reloadInterval').textContent = RELOAD_MINS_TEMP;
+
     reloadCurrentBtn.addEventListener('click', async () => {
       startReloadTab(currentTab);
     });
@@ -105,8 +107,6 @@ const RELOAD_MINS_TEMP = 0.5;
     stopCurrentBtn.addEventListener('click', async () => {
       stopReloadTab(currentTab);
     });
-
-    //TODO fill in "reloadInterval" with a val here. global is fine for now. later, we allow for per-tab vals with a default.
 
 
 
