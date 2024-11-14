@@ -5,19 +5,11 @@ import { logToUi } from './dev_utils.js';
 // TODO - some other indicator of reloading state
 // TODO options for reload interval, of course
 
-// TODO some way to kill alarm if tab is closed? so not extra processing, but also so that's a way to kill the reload. currenlty
-// yeah, these alarms keep going. i thin if tabs are closed, the alarms will keep firing... bleah.
-// Tab#onRemoved (i.e. closed.  perhaps also Tab#onUpdated where changeInfo.url has a val. but latter might have unexpected effects. maybe sanest to just keep reload in effect until closed.
-// fine point: this is then tab reloader, not site or doc reloader...
-
 // TODO refresh popup when tab is reloaded or nav'd to another location... button states stay same. does tabid stay the same? bug or feature?
 
 // note - well, i guess duh, but reloading a tab doesn't stop it from reloading (alarm is still active, tab id is not changed)
 // surprising tho - if i close and paste url i a new tab, this is still reloading..
 // TODO RECONFIRM
-
-// TODO no-discard fucntionality - priritize this!! the above is important, but don't care prioritywise
-// could also do this in a separate module, for sanity.
 
 
 const RELOAD_MINS_TEMP = 0.5;
@@ -55,7 +47,11 @@ const RELOAD_MINS_TEMP = 0.5;
         console.log(`reloading! b/c ${alarm.name}`)
         chrome.tabs.reload(tab.id);
       } else console.log(`nope, not ${alarm.name}`);
+    });
 
+    // when tab closed, kill alarm
+    chrome.tabs.onRemoved.addListener((tabId) => {
+      if(tab.id === tabId) chrome.alarms.clear(tabAlarmName(tab));
     });
 
     // is there anything we can do to show we're reloading a given tab? i suspect limited, but look into. i guess can highlight the extension button. but prolly can't mess witht he tab.
