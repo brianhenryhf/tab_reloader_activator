@@ -7,6 +7,7 @@ import { logToUi } from './dev_utils.js';
   // TODO test function - confirmed!
   // TODO cogitate on effects of navigating away, closing/reopening, etc. Curious to know effect on restart, but just to document, at best.
   // hm - you can make extension reload itself. interesting.  https://developer.chrome.com/docs/extensions/reference/api/runtime#method-reload
+  // but in dev mode, seems like it actually does this already. so, good.
   //  i guess check and be sure it doesn't get latest vsn in dev mode anyway. oh, could just make it a button in the extension or somehting... easier than finding the xtensinos tab and mesing with that. that's annoying.
   //  build tool could help me keep track of versions, perhaps? so i know what i  have running in what profile...
 
