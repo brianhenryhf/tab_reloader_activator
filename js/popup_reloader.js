@@ -14,7 +14,6 @@ import { logToUi } from './dev_utils.js';
 
 // TODO - ok try sendin message to background page and let that set up llisteners...
 
-// TODO - some other indicator of reloading state
 // TODO options for reload interval, of course
 
 // TODO refresh popup when tab is reloaded or nav'd to another location... button states stay same. does tabid stay the same? bug or feature?
@@ -24,15 +23,15 @@ import { logToUi } from './dev_utils.js';
 // TODO RECONFIRM
 
 
+//TEMP
 const RELOAD_MINS_TEMP = 0.5;
 
-//confirm IFFE needed
+//TODO confirm IFFE needed
 (() => {
   'use strict';
 
   // for now, we assume only reload alarms are important to us. later, we might adjust naming or make more geenric and bind to something specific or whatever.
 
-  // yeah, regex stuff is fiddly, filter it out.
   const tabAlarmName = (tab) => `tabReload-${tab.id}`;
 
   /** is a particular alarm relevant to a given tab */
@@ -45,72 +44,50 @@ const RELOAD_MINS_TEMP = 0.5;
     return alarms.some(alarm => isAlarmForTab(alarm, tab));
   };
 
-  const startReloadTab = async (tab) => {
-    // shortcircuit if dupe request on same tab
-    if(await isTabAlarmed(tab)) return;
-
-    // oh, this takes a callback.  but this is just be firing once, immediately. not helpful.
-    await chrome.alarms.create(tabAlarmName(tab), { periodInMinutes: RELOAD_MINS_TEMP });
-
-    chrome.alarms.onAlarm.addListener((alarm) => {
-      // logToUi(`FIRED event ${alarm.name} for tab ${tabId}`);
-      // interestingly, the id type matters for sig match. Um, aren't we doing javascript here?
-      if(isAlarmForTab(alarm, tab)) {
-        console.log(`reloading! b/c ${alarm.name}`)
-        chrome.tabs.reload(tab.id);
-      } else console.log(`nope, not ${alarm.name}`);
-    });
-
-    // when tab closed, kill alarm
-    chrome.tabs.onRemoved.addListener((tabId) => {
-      if(tab.id === tabId) chrome.alarms.clear(tabAlarmName(tab));
-    });
-
-    // is there anything we can do to show we're reloading a given tab? i suspect limited, but look into. i guess can highlight the extension button. but prolly can't mess witht he tab.
-  };
-
-
-  const stopReloadTab = async (tab) => {
-    const alarms = await chrome.alarms.getAll();
-
-    // console.log(`all alarms: ${alarms.map(a => a.name)}`)
-    // console.log(`this tab: ${tab.id}`)
-
-    //this shoild just be first or some or whatever
-    alarms.some(alarm => {
-      if(isAlarmForTab(alarm, tab)) {
-        chrome.alarms.clear(tabAlarmName(tab));
-        return true;
-      }
-    });
-  };
-
 
   let reloadCurrentBtn;
   let stopCurrentBtn;
 
   const updateButtonStates = async (currentTab) => {
+    // is there anything we can do to show we're reloading a given tab? i suspect limited, but look into. i guess can highlight the extension button. but prolly can't mess witht he tab.
     reloadCurrentBtn.disabled = await isTabAlarmed(currentTab);
     stopCurrentBtn.disabled = !reloadCurrentBtn.disabled;
   };
 
 
   window.addEventListener('DOMContentLoaded', async (event) => {
+
+    // console.dir(chrome.extension.getBackgroundPage());  //undefined
+    //console.dir(chrome.runtime.getBackgroundPage());  //explodes - do not have a background page - a background script is not same thing. background 'page' appears to be a means to include a bunch of scripts together? unclear.
+
     reloadCurrentBtn = document.querySelector('#reload-btn');
     stopCurrentBtn = document.querySelector('#stop-btn');
 
     const currentTab = await getCurrentTab();
     // console.dir(currentTab)
+    logToUi(`current tab: ${currentTab.id}`);
 
     reloadCurrentBtn.querySelector('#reloadInterval').textContent = RELOAD_MINS_TEMP;
 
     reloadCurrentBtn.addEventListener('click', async () => {
-      await startReloadTab(currentTab);
+
+      //read:
+      // https://developer.chrome.com/docs/extensions/reference/api/events#filtered
+      // https://developer.chrome.com/docs/extensions/develop/concepts/messaging
+      //
+      const response = await chrome.runtime.sendMessage({ action: 'startReloadTab', tab: currentTab, intervalMins: RELOAD_MINS_TEMP });
+
+      //this requires the tab id. and it wants to send to a content script, not service worker. fails.
+      // const response = await chrome.tabs.sendMessage(currentTab.id, {action: 'startReload', tabId: currentTab.id});
+
+      console.log(response);
+
       await updateButtonStates(currentTab);
     });
 
     stopCurrentBtn.addEventListener('click', async () => {
-      await stopReloadTab(currentTab);
+      const response = await chrome.runtime.sendMessage({ action: 'stopReloadTab', tab: currentTab, intervalMins: RELOAD_MINS_TEMP });
+      console.log(response);
       await updateButtonStates(currentTab);
     });
 
