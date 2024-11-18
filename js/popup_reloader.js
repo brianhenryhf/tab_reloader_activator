@@ -1,6 +1,18 @@
 import { getCurrentTab } from './utils.js';
 import { logToUi } from './dev_utils.js';
 
+//  based on a tab id that's only good for a session. and you can re-get tabs by it.
+
+// TODO - some other indicator of reloading state (and maybe a way to see all running alarms. at least for dev/debug purposes). oh, can see in console.
+  // but also see all tabs in current window maybe. so i can tell what tab id is what.
+// useful snippets for console
+// await chrome.tabs.query({windowId: chrome.windows.WINDOW_ID_CURRENT})
+
+// for (const { id,  url } of await chrome.tabs.query({windowId: chrome.windows.WINDOW_ID_CURRENT})) {
+//   console.log(`Name: ${id}, url: ${url}`);
+// }
+
+// TODO - ok try sendin message to background page and let that set up llisteners...
 
 // TODO - some other indicator of reloading state
 // TODO options for reload interval, of course
@@ -102,9 +114,12 @@ const RELOAD_MINS_TEMP = 0.5;
       await updateButtonStates(currentTab);
     });
 
-    //yeah prolly need to keep track of what is reloading and update buttons. capture where? in the hash? in storage? (but what happens if they leave and come back to the tab and don't expect it to be reloading still?_
-    // state in the hash seems easier in that way. but we'r enot gonna poll every tab everywher to see if we're to reload. i mean if there's some ephemeral way to associate a timer to a tab... an id?
-    //  yeah there's an id that's only good for a session. and you can re-get tabs by it. that's the cheese.
+    //TEMP/dev mode thing
+    //DO need to reload if you mess with background js.  with just popup changes you don't.
+    document.querySelector('#reset-ext-btn').addEventListener('click', async () => {
+      chrome.alarms.clearAll();
+      chrome.runtime.reload();
+    })
 
     await updateButtonStates(currentTab);
   });
