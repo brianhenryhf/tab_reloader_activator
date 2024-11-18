@@ -88,27 +88,43 @@ const stopReloadTab = async (tab) => {
   // console.log(`this tab: ${tab.id}`)
 
   if(await isTabAlarmed(tab.id)) {
-    console.log(`tab ${tabId} has an alarm! clearing..`);
-    chrome.alarms.clear(tabAlarmName(tabId))
+    console.log(`tab ${tab.id} has an alarm! clearing..`);
+    chrome.alarms.clear(tabAlarmName(tab.id))
   }
 };
 
+const getTabReloadState = async (tab) => await isTabAlarmed(tab.id);
 
-chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   // console.dir(request);  //payload sent. woo.
   // console.dir(sender);  //this is details about the extension. TODO do we need to filter on the right extension?
 
-  // console.dir(request.tab)
-  switch (request.action) {
-    case 'startReloadTab':
-      await startReloadTab(request.tab, request.intervalMins);
-      break;
-    case 'stopReloadTab':
-      await stopReloadTab(request.tab);
-      break;
-    default:
-      console.log(`unknown action received by bg: ${request.action}`);
-  }
 
-  //   sendResponse({farewell: "goodbye"});
+  // bananas: an async handler results in undefine when the response reaches the caller. can't return anything that would
+  // rely on async method. b/c promise can't be passed here. https://developer.chrome.com/docs/extensions/develop/concepts/messaging#external-webpage:~:text=Async%20functions%20are%20not%20supported%20because%20they%20return%20a%20Promise%2C%20which%20is%20not%20supported
+  // This async iffe allows this all to resolve to a promise that's basically chucked, except the 'return true' for this
+  // message allows the promise to resolve behind the scenes i guess. https://stackoverflow.com/a/46628145/1795230
+  // TODO might be more grokkable with the manual promise handling in that solution.
+  (async () => {
+    // console.dir(request.tab)
+    switch (request.action) {
+      case 'startReloadTab':
+        await startReloadTab(request.tab, request.intervalMins);
+        sendResponse({ isAlarmed: true });
+        break;
+      case 'stopReloadTab':
+        await stopReloadTab(request.tab);
+        sendResponse({ isAlarmed: false });
+        break;
+      case 'getTabReloadState':
+        const result = await getTabReloadState(request.tab);
+        sendResponse({ isAlarmed: result });
+        break;
+      default:
+        console.log(`unknown action received by bg: ${request.action}`);
+    }
+  })();
+
+  return true;
 });
