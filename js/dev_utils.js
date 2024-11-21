@@ -3,7 +3,7 @@ export const logToUi = (msg, addTimestamp = true) => {
   if(msg instanceof Object) msg = JSON.stringify(msg);
 
   const node = document.createElement('li');
-  let content = msg ? msg : '';
+  let content = msg != null ? msg : '';
 
   if(addTimestamp) content = tsLogStr(content);
   console.log(content)
