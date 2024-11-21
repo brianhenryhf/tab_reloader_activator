@@ -3,24 +3,9 @@
 
 
 // import { getCurrentTab } from './js/utils.js';
-//
-//
-// chrome.commands.onCommand.addListener(async (command) => {
-//   console.log(`Command "${command}" triggered`);
-//
-//
-//   // ok, module stuff works!
-//
-//
-//   const t = await getCurrentTab()
-//
-//   console.log(t);
-//
-//   //this works - list for toggle-suspend command.  then port over basically all the popup code?  dang. ok, current tab is avail here.  so, not too too bad.  could try to import module?
-// });
 
 
-// NOTE the 3 dups here - bad. but WIP. options for dedupe include message passing b/w popup and worker, so popup can ask
+// NOTE WIP. options for dedupe include message passing b/w popup and worker, so popup can ask
 // tab status. or just common util js used in each. given the crappy way you have to register listeners here, not entirely
 // clear having the bg js "drive" the model is a big benefit, for the clumsiness of message-passing. not like we're storing
 // any sort of state in worker, either, since we're just using global alarms.  still, perhaps a little
@@ -82,7 +67,7 @@ const startReloadTab = async (tab, intervalMins) => {
 }
 
 const stopReloadTab = async (tab) => {
-  const alarms = await chrome.alarms.getAll();
+  //const alarms = await chrome.alarms.getAll();
 
   // console.log(`all alarms: ${alarms.map(a => a.name)}`)
   // console.log(`this tab: ${tab.id}`)

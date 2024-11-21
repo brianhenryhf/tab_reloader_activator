@@ -11,9 +11,3 @@ quick impl could have a button for reload every 3 mins, and a stretch a button f
 
 htmx?
 
-
-
-ok, gonna start with v3 manifest. for quick dev. later, move to v3.
-
-
-oh, but maybe suspender is v3?  steal from there. for now, get a thing going.  eh, the apis differ. easier to go with 3?
