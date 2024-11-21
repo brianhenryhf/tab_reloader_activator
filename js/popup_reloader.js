@@ -98,13 +98,6 @@ const DEFAULT_RELOAD_MINS = 0.5;
       await updateButtonStates(isAlarmed);
     });
 
-    //TEMP/dev mode thing
-    //DO need to reload if you mess with background js.  with just popup changes you don't.
-    document.querySelector('#reset-ext-btn').addEventListener('click', async () => {
-      chrome.alarms.clearAll();
-      chrome.runtime.reload();
-    })
-
     const { isAlarmed } = await chrome.runtime.sendMessage({
       action: 'getTabReloadState',
       tab: currentTab
@@ -112,4 +105,14 @@ const DEFAULT_RELOAD_MINS = 0.5;
 
     await updateButtonStates(isAlarmed);
   });
+
+
+
+  //TEMP/dev mode thing
+  //DO need to reload if you mess with background js.  with just popup changes you don't.
+  document.querySelector('#reset-ext-btn').addEventListener('click', async () => {
+    chrome.alarms.clearAll();
+    chrome.runtime.reload();
+  })
+
 })();
