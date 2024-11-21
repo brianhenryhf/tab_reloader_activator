@@ -6,7 +6,8 @@ export const logToUi = (msg, addTimestamp = true) => {
   let content = msg ? msg : '';
 
   if(addTimestamp) content = tsLogStr(content);
-  node.append(content);
+  console.log(content)
+  node.innerHTML = content;
   document.querySelector('#log-area > ul').append(node);
 };
 

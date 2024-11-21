@@ -53,6 +53,17 @@ const DEFAULT_RELOAD_MINS = 0.5;
     // console.dir(currentTab)
     logToUi(`current tab: ${currentTab.id}`);
 
+    logToUi(`all alarms: ${
+      JSON.stringify(
+        await chrome.alarms.getAll(),
+        null,
+        2
+      )
+      .replaceAll(/ /g, "&nbsp;")
+      .replaceAll(/\t/g, "&nbsp;&nbsp;")
+      .replaceAll(/\n/g, "<br />")
+    }`);
+
     reloadIntervalInput.defaultValue = DEFAULT_RELOAD_MINS.toString();
 
     reloadCurrentBtn.addEventListener('click', async () => {
