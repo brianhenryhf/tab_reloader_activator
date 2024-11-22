@@ -1,6 +1,15 @@
 // convenience method - this can be useful in popup debugging, for example.
 export const logToUi = (msg, addTimestamp = true) => {
-  if(msg instanceof Object) msg = JSON.stringify(msg);
+  if(msg instanceof Object) {
+    msg = JSON.stringify(
+        msg,
+        null,
+        2
+    )
+    .replaceAll(/ /g, "&nbsp;")
+    .replaceAll(/\t/g, "&nbsp;&nbsp;")
+    .replaceAll(/\n/g, "<br />");
+  }
 
   const node = document.createElement('li');
   let content = msg != null ? msg : '';
