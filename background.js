@@ -15,12 +15,17 @@ const tabAlarmName = (tabId) => `tabReload-${tabId}`;
 
 const isAlarmForTab = (alarm, tabId) => alarm.name === tabAlarmName(tabId);
 
-/** does a tab have any alarm we care about (w/r/t reloading)? */
-// Async! change naming to clarify? b/c always truthy when not awaited... blasted red/blue problem made worse with weak typing.
-const isTabAlarmed = async (tabId) => {
+const tabAlarmState = async (tabId) => {
   const alarms = await chrome.alarms.getAll();
-  return alarms.some(alarm => isAlarmForTab(alarm, tabId));
+  const tabSpecificAlarm = alarms.find(alarm => isAlarmForTab(alarm, tabId));
+
+  return {
+    tabId: tabId,
+    alarmed: tabSpecificAlarm != null,
+    intervalMins: tabSpecificAlarm?.periodInMinutes
+  }
 };
+
 
 
 // finicky to get  alarm listening to work - appears the listener has to be added as we do here - in worker, at root
@@ -51,7 +56,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 chrome.tabs.onRemoved.addListener(async (tabId) => {
   console.log(`tab ${tabId} closed.`);
 
-  if(await isTabAlarmed(tabId)) {
+  if((await tabAlarmState(tabId)).alarmed) {
     console.log(`tab ${tabId} had an alarm! clearing..`);
     chrome.alarms.clear(tabAlarmName(tabId))
   }
@@ -60,7 +65,7 @@ chrome.tabs.onRemoved.addListener(async (tabId) => {
 
 const startReloadTab = async (tab, intervalMins) => {
   // shortcircuit if dupe request on same tab somehow
-  if(await isTabAlarmed(tab.id)) return;
+  if((await tabAlarmState(tab.id)).alarmed) return;
 
   // oh, this takes a callback.  but this is just be firing once, immediately. not helpful.
   await chrome.alarms.create(tabAlarmName(tab.id), { periodInMinutes: intervalMins });
@@ -72,13 +77,13 @@ const stopReloadTab = async (tab) => {
   // console.log(`all alarms: ${alarms.map(a => a.name)}`)
   // console.log(`this tab: ${tab.id}`)
 
-  if(await isTabAlarmed(tab.id)) {
+  if((await tabAlarmState(tab.id)).alarmed) {
     console.log(`tab ${tab.id} has an alarm! clearing..`);
     chrome.alarms.clear(tabAlarmName(tab.id))
   }
 };
 
-const getTabReloadState = async (tab) => await isTabAlarmed(tab.id);
+const getTabReloadState = async (tab) => await tabAlarmState(tab.id);
 
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -92,19 +97,23 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   // message allows the promise to resolve behind the scenes i guess. https://stackoverflow.com/a/46628145/1795230
   // TODO might be more grokkable with the manual promise handling in that solution.
   (async () => {
+    let result;
     // console.dir(request.tab)
     switch (request.action) {
       case 'startReloadTab':
         await startReloadTab(request.tab, request.intervalMins);
-        sendResponse({ isAlarmed: true });
+        result = await getTabReloadState(request.tab);
+        sendResponse(result);
+        // NOTE you really have to sendReponse at least if you return true. else silence....
         break;
       case 'stopReloadTab':
         await stopReloadTab(request.tab);
-        sendResponse({ isAlarmed: false });
+        result = await getTabReloadState(request.tab);
+        sendResponse(result);
         break;
       case 'getTabReloadState':
-        const result = await getTabReloadState(request.tab);
-        sendResponse({ isAlarmed: result });
+        result = await getTabReloadState(request.tab);
+        sendResponse(result);
         break;
       default:
         console.log(`unknown action received by bg: ${request.action}`);
