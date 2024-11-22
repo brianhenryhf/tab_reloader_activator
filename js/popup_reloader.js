@@ -1,5 +1,5 @@
 import { getCurrentTab } from './utils.js';
-import {logToUi, tsLog} from './dev_utils.js';
+import { logToUi } from './dev_utils.js';
 
 //  based on a tab id that's only good for a session. and you can re-get tabs by it.
 
@@ -47,7 +47,6 @@ const DEFAULT_RELOAD_MINS = 0.5;
     reloadIntervalInput = document.querySelector('#reloadInterval');
 
     const currentTab = await getCurrentTab();
-    // console.dir(currentTab)
     logToUi(`current tab: ${currentTab.id}`);
 
     logToUi(`alarms follow: `);
@@ -58,10 +57,6 @@ const DEFAULT_RELOAD_MINS = 0.5;
     let reloadState;
 
     reloadCurrentBtn.addEventListener('click', async () => {
-      //read:
-      // https://developer.chrome.com/docs/extensions/reference/api/events#filtered
-      // https://developer.chrome.com/docs/extensions/develop/concepts/messaging
-      //
       reloadState = await chrome.runtime.sendMessage({
         action: 'startReloadTab',
         tab: currentTab,
