@@ -1,6 +1,5 @@
 // convenience method - this can be useful in popup debugging, for example.
 
-// TODO this should be configurable via UI
 export const DEV_MODE = true;
 
 if(!DEV_MODE) console.log('DEV_MODE and consequent UI logging disabled');
