@@ -1,5 +1,5 @@
 import { getCurrentTab } from './utils.js';
-import { logToUi } from './dev_utils.js';
+import { logToUi, DEV_MODE } from './dev_utils.js';
 
 //  based on a tab id that's only good for a session. and you can re-get tabs by it.
 
@@ -92,9 +92,14 @@ const DEFAULT_RELOAD_MINS = 0.5;
 
   //TEMP/dev mode thing
   //DO need to reload if you mess with background js.  with just popup changes you don't.
-  document.querySelector('#reset-ext-btn').addEventListener('click', async () => {
-    chrome.alarms.clearAll();
-    chrome.runtime.reload();
-  })
+  const devTools =  document.querySelector('#dev-tools');
 
+  if(DEV_MODE) {
+    devTools.querySelector('#reset-ext-btn').addEventListener('click', async () => {
+      chrome.alarms.clearAll();
+      chrome.runtime.reload();
+    });
+  } else {
+    devTools.hidden = true;
+  }
 })();

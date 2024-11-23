@@ -1,12 +1,12 @@
 // convenience method - this can be useful in popup debugging, for example.
 
 // TODO this should be configurable via UI
-const LOG_TO_UI_ENABLED = true;
+export const DEV_MODE = true;
 
-if(!LOG_TO_UI_ENABLED) console.log('UI logging disabled');
+if(!DEV_MODE) console.log('DEV_MODE and consequent UI logging disabled');
 
 export const logToUi = (...msgs) => {
-  if(!LOG_TO_UI_ENABLED) return;
+  if(!DEV_MODE) return;
 
   // logs msgs with no newline b/w them
   const compositeMsg = msgs.map(msg => {
