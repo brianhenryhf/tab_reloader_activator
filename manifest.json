@@ -7,9 +7,9 @@
     "default_title": "open",
     "default_popup": "popup.html",
     "default_icon": {                   
-      "16": "images/16x16.png",
-      "48": "images/48x48.png",
-      "128": "images/128x128.png" 
+      "16": "images/16x16.svg",
+      "48": "images/48x48.svg",
+      "128": "images/128x128.svg"
     }
   },
   "background": {
@@ -17,9 +17,9 @@
     "type": "module"
   },
   "icons": {
-    "16": "images/16x16.png",
-    "48": "images/48x48.png",
-    "128": "images/128x128.png" 
+    "16": "images/16x16.svg",
+    "48": "images/48x48.svg",
+    "128": "images/128x128.svg"
   },
   "manifest_version": 3
 }
