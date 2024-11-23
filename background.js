@@ -1,10 +1,5 @@
 // this file has to be in extension root for whatever reason.  TODO reconfirm
 
-
-
-// import { getCurrentTab } from './js/utils.js';
-
-
 // NOTE WIP. options for dedupe include message passing b/w popup and worker, so popup can ask
 // tab status. or just common util js used in each. given the crappy way you have to register listeners here, not entirely
 // clear having the bg js "drive" the model is a big benefit, for the clumsiness of message-passing. not like we're storing

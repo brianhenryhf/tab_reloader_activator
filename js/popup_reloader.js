@@ -29,6 +29,7 @@ const DEFAULT_RELOAD_MINS = 0.5;
 
   const updateControlStates = async (reloadState) => {
     logToUi((reloadState))
+
     // is there anything we can do to show we're reloading a given tab? i suspect limited, but look into. i guess can highlight the extension button. but prolly can't mess witht he tab.
 
     reloadCurrentBtn.disabled = reloadState.alarmed;
@@ -48,9 +49,7 @@ const DEFAULT_RELOAD_MINS = 0.5;
 
     const currentTab = await getCurrentTab();
     logToUi(`current tab: ${currentTab.id}`);
-
-    logToUi(`alarms follow: `);
-    logToUi(await chrome.alarms.getAll());
+    logToUi(`alarms: `, await chrome.alarms.getAll());
 
     reloadIntervalInput.defaultValue = DEFAULT_RELOAD_MINS.toString();
 

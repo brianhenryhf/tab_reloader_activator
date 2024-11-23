@@ -1,22 +1,22 @@
 // convenience method - this can be useful in popup debugging, for example.
-export const logToUi = (msg, addTimestamp = true) => {
-  if(msg instanceof Object) {
-    msg = JSON.stringify(
-        msg,
-        null,
-        2
-    )
-    .replaceAll(/ /g, "&nbsp;")
-    .replaceAll(/\t/g, "&nbsp;&nbsp;")
-    .replaceAll(/\n/g, "<br />");
-  }
+export const logToUi = (...msgs) => {
+  // logs msgs with no newline b/w them
+  const compositeMsg = msgs.map(msg => {
+    if(msg instanceof Object) {
+      return JSON.stringify(
+          msg,
+          null,
+          2
+      )
+      .replaceAll(/ /g, "&nbsp;")
+      .replaceAll(/\t/g, "&nbsp;&nbsp;")
+      .replaceAll(/\n/g, "<br />");
+    } else return msg;
+  })
+  const formattedContent = tsLogStr(compositeMsg.join(''));
 
-  const node = document.createElement('li');
-  let content = msg != null ? msg : '';
-
-  if(addTimestamp) content = tsLogStr(content);
-  console.log(content)
-  node.innerHTML = content;
+  const node = document.createElement('li');;
+  node.innerHTML = formattedContent;
   document.querySelector('#log-area > ul').append(node);
 };
 
