@@ -28,7 +28,7 @@ const DEFAULT_RELOAD_MINS = 0.5;
   let reloadIntervalInput;
 
   const updateControlStates = async (reloadState) => {
-    logToUi((reloadState))
+    logToUi(reloadState);
 
     // is there anything we can do to show we're reloading a given tab? i suspect limited, but look into. i guess can highlight the extension button. but prolly can't mess witht he tab.
 
@@ -37,6 +37,30 @@ const DEFAULT_RELOAD_MINS = 0.5;
     if(reloadState.alarmed) reloadIntervalInput.value = reloadState.intervalMins;
 
     stopCurrentBtn.disabled = !reloadState.alarmed;
+  };
+
+  const stopHandler = async (tab) => {
+    //TODO confirm await is necessary/supported here and elsewhere. the api for this is weird.
+
+    const reloadState = await chrome.runtime.sendMessage({
+      action: 'stopReloadTab',
+      tab
+    });
+
+    await updateControlStates(reloadState);
+  };
+
+  const startHandler = async (tab) => {
+    const reloadState = await chrome.runtime.sendMessage({
+      action: 'startReloadTab',
+      tab,
+      intervalMins: Number.parseFloat(reloadIntervalInput.value)
+    });
+
+    //this requires the tab id. and it wants to send to a content script, not service worker. fails.
+    // const response = await chrome.tabs.sendMessage(currentTab.id, {action: 'startReload', tabId: currentTab.id});
+
+    await updateControlStates(reloadState);
   };
 
   window.addEventListener('DOMContentLoaded', async (event) => {
@@ -53,34 +77,10 @@ const DEFAULT_RELOAD_MINS = 0.5;
 
     reloadIntervalInput.defaultValue = DEFAULT_RELOAD_MINS.toString();
 
-    let reloadState;
+    reloadCurrentBtn.addEventListener('click', startHandler.bind(null,  currentTab));
+    stopCurrentBtn.addEventListener('click', stopHandler.bind(null,  currentTab));
 
-    reloadCurrentBtn.addEventListener('click', async () => {
-      reloadState = await chrome.runtime.sendMessage({
-        action: 'startReloadTab',
-        tab: currentTab,
-        intervalMins: Number.parseFloat(reloadIntervalInput.value)
-      });
-
-      //this requires the tab id. and it wants to send to a content script, not service worker. fails.
-      // const response = await chrome.tabs.sendMessage(currentTab.id, {action: 'startReload', tabId: currentTab.id});
-
-      await updateControlStates(reloadState);
-    });
-
-    stopCurrentBtn.addEventListener('click', async () => {
-
-      //TODO confirm await is necessary/supported here and elsewhere. the api for this is weird.
-
-      reloadState = await chrome.runtime.sendMessage({
-        action: 'stopReloadTab',
-        tab: currentTab
-      });
-
-      await updateControlStates(reloadState);
-    });
-
-    reloadState = await chrome.runtime.sendMessage({
+    const reloadState = await chrome.runtime.sendMessage({
       action: 'getTabReloadState',
       tab: currentTab
     });
@@ -88,10 +88,8 @@ const DEFAULT_RELOAD_MINS = 0.5;
     await updateControlStates(reloadState);
   });
 
-
-
   //TEMP/dev mode thing
-  //DO need to reload if you mess with background js.  with just popup changes you don't.
+  //NOTE you DO need to reload if you mess with background js.  with just popup changes you don't.
   const devTools =  document.querySelector('#dev-tools');
 
   if(DEV_MODE) {
