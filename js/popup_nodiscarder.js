@@ -13,7 +13,8 @@ import { logToUi, DEV_MODE } from './dev_utils.js';
 
 
   // TODO note that my dev reload thing doesn't undo no-discard. i don't think.  but it does kill the badge. not ideal.
-  // also could dump reload state in devmode to popup...
+  // but really, the dev buttons are also inappropriately in the reloader js.  move out to third script. i'm not sure this could/should easily undo
+  // all no-discards (or need to, since this is simpler), but it could trigger the badge state-recalculation?
 
   // TODO also consider updating extension title for this or reload activation
 
