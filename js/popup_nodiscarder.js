@@ -12,6 +12,11 @@ import { logToUi } from './dev_utils.js';
   //  build tool could help me keep track of versions, perhaps? so i know what i  have running in what profile...
 
 
+  // TODO note that my dev reload thing doesn't undo no-discard. i don't think.  but it does kill the badge. not ideal.
+  // also could dump reload state in devmode to popup...
+
+  // TODO also consider updating extension title for this or reload activation
+
   const isTabDiscardable = (tab) => {
     return tab.autoDiscardable;
   };
@@ -39,7 +44,6 @@ import { logToUi } from './dev_utils.js';
     restartDiscardBtn = document.querySelector('#rediscard-btn');
 
     const currentTab = await getCurrentTab();
-    // console.dir(currentTab)
 
     stopDiscardBtn.addEventListener('click', async () => {
       const updatedTab = await stopDiscardTab(currentTab);

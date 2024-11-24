@@ -20,6 +20,13 @@ import { logToUi, DEV_MODE } from './dev_utils.js';
 
 // TODO prolly makes sense to not allow no-discard and popup at same time. hard to show on badge if both in effect...
 
+// TODO rectify approach in reload vs discard - at least document that we do the reload message-passing to background at the least
+// b/c it's the only way to get persistent listeners to alrams. this isn't need in reloader, but still a bit weird we take
+// 2 approaches.  TODO ALSO - get the fxns that do stuff out to modules, not directly in the background.js or in popup reloader js.
+
+// TODO consider: is is useful to have an overview of what is currently reloading/discarded in the UI. at least tucked away somewhere? that would also
+// suggest you should be able to modify that list there. not sure i want/need to get into that. so, i dunno - maybe just some debug R/O feature.
+
 const DEFAULT_RELOAD_MINS = 0.5;
 
 //TODO confirm IFFE needed
