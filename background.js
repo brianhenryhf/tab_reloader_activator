@@ -105,26 +105,26 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   // message allows the promise to resolve behind the scenes i guess. https://stackoverflow.com/a/46628145/1795230
   // TODO might be more grokkable with the manual promise handling in that solution.
   (async () => {
-    let result;
+    let reloadState;
     // console.dir(request.tab)
     switch (request.action) {
       case 'startReloadTab':
         await startReloadTab(request.tab, request.intervalMins);
-        result = await getTabReloadState(request.tab);
-        await updateBadge(result);
-        sendResponse(result);
+        reloadState = await getTabReloadState(request.tab);
+        await updateBadge(reloadState);
+        sendResponse(reloadState);
         // NOTE you really have to sendReponse at least if you return true. else silence....
         break;
       case 'stopReloadTab':
         await stopReloadTab(request.tab);
-        result = await getTabReloadState(request.tab);
-        await updateBadge(result);
-        sendResponse(result);
+        reloadState = await getTabReloadState(request.tab);
+        await updateBadge(reloadState);
+        sendResponse(reloadState);
         break;
       case 'getTabReloadState':
-        result = await getTabReloadState(request.tab);
-        await updateBadge(result);
-        sendResponse(result);
+        reloadState = await getTabReloadState(request.tab);
+        await updateBadge(reloadState);
+        sendResponse(reloadState);
         break;
       default:
         console.log(`unknown action received by bg: ${request.action}`);
