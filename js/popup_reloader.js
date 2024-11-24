@@ -16,6 +16,9 @@ import { logToUi, DEV_MODE } from './dev_utils.js';
 // surprising tho - if i close and paste url i a new tab, this is still reloading..
 // TODO RECONFIRM
 
+//TODO - perhaps some kind of reload countdown? - in badge text or when popup is open? or at least some reload imminent badge background change in last 10 seconds?
+
+// TODO prolly makes sense to not allow no-discard and popup at same time. hard to show on badge if both in effect...
 
 const DEFAULT_RELOAD_MINS = 0.5;
 

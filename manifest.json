@@ -4,7 +4,7 @@
   "version": "0.1",
   "permissions": ["tabs", "contextMenus", "commands", "alarms"],
   "action": {
-    "default_title": "open",
+    "default_title": "BH Tab Reloader/Activator",
     "default_popup": "popup.html",
     "default_icon": {                   
       "16": "images/16x16.png",

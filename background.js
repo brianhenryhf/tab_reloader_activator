@@ -80,6 +80,19 @@ const stopReloadTab = async (tab) => {
 
 const getTabReloadState = async (tab) => await tabAlarmState(tab.id);
 
+const updateBadge = async (tabReloadState) => {
+  const baseSpec = { tabId: tabReloadState.tabId };
+
+  if(tabReloadState.alarmed) {
+    // i guess for countdown text might be a bit small (4 chars).
+    await chrome.action.setBadgeText({ ...baseSpec, text: tabReloadState.intervalMins.toString() }); // note emojis work: // text: "🔄"
+
+    // green means reload is on for tab, number shown is reload interval in effect
+    await chrome.action.setBadgeBackgroundColor({ ...baseSpec, color: "lightgreen" });
+  } else {
+    await chrome.action.setBadgeText({ ...baseSpec, text: null });
+  }
+}
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   // console.dir(request);  //payload sent. woo.
@@ -98,16 +111,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       case 'startReloadTab':
         await startReloadTab(request.tab, request.intervalMins);
         result = await getTabReloadState(request.tab);
+        await updateBadge(result);
         sendResponse(result);
         // NOTE you really have to sendReponse at least if you return true. else silence....
         break;
       case 'stopReloadTab':
         await stopReloadTab(request.tab);
         result = await getTabReloadState(request.tab);
+        await updateBadge(result);
         sendResponse(result);
         break;
       case 'getTabReloadState':
         result = await getTabReloadState(request.tab);
+        await updateBadge(result);
         sendResponse(result);
         break;
       default:
