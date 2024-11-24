@@ -123,7 +123,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         break;
       case 'getTabReloadState':
         reloadState = await getTabReloadState(request.tab);
-        await updateBadge(reloadState);
+        // see nodiscrd js for conflict issue here.. //ok for now, going to assume normal use doesn't have the conflict. we don't need to re-set the badge on pop-up open...
+        // await updateBadge(reloadState);
         sendResponse(reloadState);
         break;
       default:
