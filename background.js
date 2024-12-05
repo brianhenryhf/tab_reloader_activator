@@ -38,6 +38,9 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
     try {
       const tab = await chrome.tabs.get(tabId);
       console.log(`reloading tab ${tabId} (${tab.url})! b/c alarm ${alarm.name}`);
+
+      // awaiting here is not helpful - this returns nearly immediately, even when _actual_ reload takes much longer.
+      // we'll handle results with unUpdated.
       chrome.tabs.reload(tabId);
     } catch (e){
       console.log(`tab ${tabId} cannot be retrieved for alarm ${alarm.name}. Killing alarm.`);
@@ -57,6 +60,16 @@ chrome.tabs.onRemoved.addListener(async (tabId) => {
   }
 });
 
+
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  // console.log(`tab ${tabId} updated: ${JSON.stringify(changeInfo)}; ${JSON.stringify(tab)}`);
+
+  //tab reload kills the badge - re-set it
+  if(changeInfo['status'] === 'complete') {
+    const reloadState = await getTabReloadState(tab);
+    await updateBadge(reloadState);
+  }
+})
 
 const startReloadTab = async (tab, intervalMins) => {
   // shortcircuit if dupe request on same tab somehow
